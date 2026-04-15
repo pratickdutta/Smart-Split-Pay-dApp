@@ -147,45 +147,21 @@ Or visit the live deployment → **[smart-split-ebon.vercel.app](https://smart-s
 
 ---
 
-## White Belt Progression
 
-> End-to-end development journey from initial build to final polished submission.
-
-### 🥋 White Belt Certificate
-
-![White Belt Certificate](screenshots/white-belt-certificate.png)
-
----
 
 ### Stage 1 — Landing Page (Wallet Disconnected)
 
-Initial clean state. Premium dark theme with cyan–violet gradient title, glassmorphism wallet card, and live Stellar Testnet badge.
-
-![Stage 1 – Wallet Disconnected](screenshots/01-wallet-disconnected.png)
-
----
-
-### Stage 2 — 3D Wireframe Background (v1)
-
-First 3D iteration: colorful wireframe geometric objects (tori, icosahedrons, octahedra) floating across the background using React Three Fiber.
-
-![Stage 2 – 3D Wireframe Theme](screenshots/02-3d-wireframe-theme.png)
+Smart Split & Pay is a premium dark-themed Stellar Testnet dApp with a cyan–violet gradient UI, glassmorphism wallet card, and live network badge. Built using React and Freighter, it enables secure wallet connection, XLM balance display, and seamless transactions with real-time feedback and hash tracking. The UI is enhanced with React Three Fiber, featuring floating wireframe geometries for a modern Web3 feel. Designed for scalability, it serves as a foundation for future features like bill splitting and smart contract integration.
+![Stage 1 – Wallet Disconnected](screenshots/03-interstellar-theme.png)
 
 ---
 
-### Stage 3 — Interstellar Space Theme (Final)
 
-Refined to a cinematic Interstellar-inspired scene: 1,800-star deep-space field, pulsing wormhole gravitational ring, ringed planet with atmosphere glow, nebula clouds, and data crystals. Fewer objects, far more majestic.
-
-![Stage 3 – Interstellar Theme](screenshots/03-interstellar-theme.png)
-
----
-
-### Stage 4 — Wallet Connected + Live Balance
+### Stage 2 — Wallet Connected + Live Balance
 
 Freighter connected — live testnet XLM balance (`10,000 XLM`) fetched from Stellar Horizon API. Split & Pay form revealed below with recipient address and amount fields.
 
-![Stage 4 – Wallet Connected & Balance](screenshots/04-wallet-connected-balance.png)
+![Stage 2 – Wallet Connected & Balance](screenshots/04-wallet-connected-balance.png)
 
 ---
 
