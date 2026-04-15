@@ -1,7 +1,8 @@
 import {
+  isConnected,
   isAllowed,
   setAllowed,
-  getUserInfo,
+  getAddress,
   signTransaction,
 } from "@stellar/freighter-api";
 import { Horizon, Keypair, TransactionBuilder, Networks, Asset } from "@stellar/stellar-sdk";
@@ -11,14 +12,23 @@ const server = new Horizon.Server("https://horizon-testnet.stellar.org");
 
 export const connectWallet = async () => {
   try {
-    let allowed = await isAllowed();
-    if (!allowed) {
-      await setAllowed();
-      allowed = await isAllowed();
+    const connectedStatus = await isConnected();
+    if (!connectedStatus.isConnected) {
+      throw new Error("Freighter is not installed or connected");
     }
-    if (allowed) {
-      const userInfo = await getUserInfo();
-      return userInfo.publicKey;
+
+    let allowedStatus = await isAllowed();
+    if (!allowedStatus.isAllowed) {
+      await setAllowed();
+      allowedStatus = await isAllowed();
+    }
+    
+    if (allowedStatus.isAllowed) {
+      const addressInfo = await getAddress();
+      if (addressInfo.error) {
+         throw new Error(addressInfo.error);
+      }
+      return addressInfo.address;
     }
     return null;
   } catch (error) {
@@ -65,16 +75,16 @@ export const sendPayment = async (senderPublicKey, destinationPublicKey, amount)
     const xdr = transaction.toXDR();
 
     // 4. Sign transaction with Freighter
-    const signedXdr = await signTransaction(xdr, {
+    const signedXdrResponse = await signTransaction(xdr, {
       network: "TESTNET",
     });
 
-    if (signedXdr.error) {
-      throw new Error(signedXdr.error || "Transaction signing failed");
+    if (signedXdrResponse.error) {
+      throw new Error(signedXdrResponse.error || "Transaction signing failed");
     }
 
     // 5. Build signed transaction from XDR
-    const signedTransaction = TransactionBuilder.fromXDR(signedXdr, Networks.TESTNET);
+    const signedTransaction = TransactionBuilder.fromXDR(signedXdrResponse.signedTxXdr, Networks.TESTNET);
 
     // 6. Submit the transaction to the Stellar Testnet
     const result = await server.submitTransaction(signedTransaction);
