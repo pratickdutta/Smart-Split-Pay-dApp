@@ -27,7 +27,8 @@ export default function ContractPanel({ publicKey, onResult }) {
     setErrorInfo(null);
 
     try {
-      const splitValue = (parseFloat(amount) / splitCount).toFixed(7);
+      const safeDivisor = Math.max(2, parseInt(splitCount, 10) || 2);
+      const splitValue = (parseFloat(amount) / safeDivisor).toFixed(7);
       const result = await sacTransfer(publicKey, activeRecipients, splitValue);
       setTxHash(result.hash);
       setStatus('success');
@@ -112,13 +113,14 @@ export default function ContractPanel({ publicKey, onResult }) {
                   type="number"
                   value={splitCount}
                   onChange={(e) => {
-                    const c = Math.max(2, parseInt(e.target.value) || 2);
-                    setSplitCount(c);
-                    // adjust recipients array to match N-1
+                    setSplitCount(e.target.value);
+                    const parsed = parseInt(e.target.value, 10);
+                    // Native HTML validation min="2" catches submit. Here we just ensure N-1 renders safely.
+                    const safeCount = (isNaN(parsed) || parsed < 2) ? 2 : parsed;
                     setRecipients(prev => {
                       const updated = [...prev];
-                      while (updated.length < c - 1) updated.push('');
-                      return updated.slice(0, c - 1);
+                      while (updated.length < safeCount - 1) updated.push('');
+                      return updated.slice(0, safeCount - 1);
                     });
                   }}
                   min="2"
@@ -131,10 +133,12 @@ export default function ContractPanel({ publicKey, onResult }) {
             </div>
 
             {/* Render N-1 Address Inputs */}
-            {recipients.map((rec, idx) => (
+            {recipients.map((rec, idx) => {
+              const safeDivisor = Math.max(2, parseInt(splitCount, 10) || 2);
+              return (
               <div key={idx}>
                 <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
-                  Payee {idx + 1} Address (gets {(parseFloat(amount || 0) / splitCount).toFixed(4)} XLM)
+                  Payee {idx + 1} Address (gets {(parseFloat(amount || 0) / safeDivisor).toFixed(4)} XLM)
                 </label>
                 <input
                   type="text"
@@ -150,7 +154,8 @@ export default function ContractPanel({ publicKey, onResult }) {
                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(124,58,237,0.2)', color: 'white' }}
                 />
               </div>
-            ))}
+              );
+            })}
 
             <button
               id="contract-transfer-btn"
