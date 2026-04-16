@@ -122,11 +122,6 @@ function App() {
             <span className="font-display font-bold text-base tracking-tight" style={{ color: 'var(--text-primary)' }}>
               SmartSplit
             </span>
-            {/* Yellow Belt badge */}
-            <span className="px-2 py-0.5 rounded-full text-xs font-bold"
-              style={{ background: 'rgba(234,179,8,0.12)', border: '1px solid rgba(234,179,8,0.25)', color: '#eab308' }}>
-              🥋 Yellow Belt
-            </span>
           </div>
 
           {/* Network badge */}
