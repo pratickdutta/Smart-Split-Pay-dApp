@@ -16,9 +16,6 @@ export default function ActivityFeed() {
   const [lastRefresh, setLastRefresh] = useState(null);
 
   const load = useCallback(async () => {
-    // Only show loading indicator if we don't have events already, to stop layout flickering
-    if (events.length === 0) setLoading(true);
-    
     try {
       const evs = await fetchContractEvents();
       
