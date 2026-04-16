@@ -251,6 +251,8 @@ Uses **`@creit.tech/stellar-wallets-kit` v2** for multi-wallet support. When the
 | **Rabet** | Browser Extension | ✓ Auto-detected |
 | **WalletConnect** | QR Code | ✓ Always available |
 
+![Multi-Wallet Options](screenshots/06-yellow-belt-wallet-options.png)
+
 ### Wallet Connect Flow
 ```
 User clicks "Connect" 
@@ -278,6 +280,8 @@ The **Contract Panel** component (`src/components/ContractPanel.jsx`) calls the 
 ### Transaction Hash (Example Contract Call)
 
 **Transaction Hash:** `cbfbdd7f72b89bf015c0c23a82835e0dc844d096f05b0bb085dcbbeefb8baefe`
+
+![Soroban Transaction Hash](screenshots/05-yellow-belt-tx-hash.png)
 
 **Verify on Explorer:** [View on Stellar Expert →](https://stellar.expert/explorer/testnet/tx/cbfbdd7f72b89bf015c0c23a82835e0dc844d096f05b0bb085dcbbeefb8baefe)
 
@@ -407,7 +411,7 @@ npm run dev
 - [x] **Contract called from frontend** — `ContractPanel.jsx` → `sacTransfer()` → Soroban RPC
 - [x] **Transaction status visible** — pending spinner / success hash / error card
 - [x] **Multi-wallet support** — StellarWalletsKit v2 with Freighter, LOBSTR, Albedo, xBull
-- [x] **Wallet options screenshot** — see White Belt screenshots section above
+- [x] **Wallet options screenshot** — included in the Multi-Wallet Integration section above
 - [x] **Activity Feed** — polls Soroban events every 30s
 
 ---
