@@ -23,7 +23,10 @@ export default function ActivityFeed() {
       setEvents(prev => {
         const isIdentical = prev.length === evs.length && prev.every((e, i) => e.id === evs[i].id);
         if (isIdentical) return prev;
-        localStorage.setItem('smartsplit_events', JSON.stringify(evs));
+        
+        localStorage.setItem('smartsplit_events', JSON.stringify(evs, (_, v) => 
+          typeof v === 'bigint' ? v.toString() : v
+        ));
         return evs;
       });
     } catch {
