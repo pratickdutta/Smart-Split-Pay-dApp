@@ -31,7 +31,7 @@ export default function ActivityFeed() {
 
   useEffect(() => {
     load();
-    const timer = setInterval(load, 30_000);
+    const timer = setInterval(load, 5000);
     return () => clearInterval(timer);
   }, [load]);
 
