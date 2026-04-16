@@ -277,10 +277,9 @@ The **Contract Panel** component (`src/components/ContractPanel.jsx`) calls the 
 
 ### Transaction Hash (Example Contract Call)
 
-> After making a contract call, the transaction hash is displayed with a direct explorer link.  
-> A real hash will appear here once a transfer is executed on testnet.
+**Transaction Hash:** `cbfbdd7f72b89bf015c0c23a82835e0dc844d096f05b0bb085dcbbeefb8baefe`
 
-**Verify on Explorer:** `https://stellar.expert/explorer/testnet/tx/{HASH}`
+**Verify on Explorer:** [View on Stellar Expert →](https://stellar.expert/explorer/testnet/tx/cbfbdd7f72b89bf015c0c23a82835e0dc844d096f05b0bb085dcbbeefb8baefe)
 
 ---
 
