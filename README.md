@@ -7,49 +7,49 @@
 [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-smart--split--ebon.vercel.app-00d4ff?style=for-the-badge)](https://smart-split-ebon.vercel.app/)
 [![Stellar](https://img.shields.io/badge/Network-Stellar%20Testnet-7c3aed?style=flat-square)](https://stellar.org)
 [![React](https://img.shields.io/badge/Frontend-React%20+%20Vite-61dafb?style=flat-square)](https://react.dev)
-[![Three.js](https://img.shields.io/badge/3D-Three.js%20+%20R3F-white?style=flat-square)](https://threejs.org)
 
 </div>
 
 ---
 
-## Description
+## Project Description
 
-Smart Split & Pay is a Web3 dApp built on the **Stellar Testnet** that lets friends connect their wallets, view live XLM balances, and split bills by sending payments directly on-chain — no middlemen, no delay.
+**Smart Split & Pay** is a Web3 bill-splitting dApp built on the **Stellar Testnet**. It lets friends connect their Freighter wallets, check live XLM balances, and split bills by sending on-chain payments — no middlemen, no delay.
 
-By framing transactions around everyday bill-splitting, it bridges the gap between raw crypto transfers and real-world utility. The interface features a cinematic **Interstellar-themed 3D background** (star field, wormhole ring, ringed planet) powered by Three.js, with a premium glassmorphism UI built in React + Tailwind CSS.
+The app is built with React + Vite, styled with Tailwind CSS and glassmorphism, and features a cinematic **Interstellar-themed 3D background** powered by Three.js (star field, wormhole ring, ringed planet, data crystals).
 
-### Key Features
+### What it does
 
 | Feature | Description |
 |---|---|
-| 🔗 **Wallet Connect** | One-click Freighter integration with live connection status |
-| 💰 **Live Balance** | Real-time XLM balance via Stellar Horizon API |
-| ✈️ **Split & Pay** | Send XLM to any Stellar address in one transaction |
-| 📡 **TX Feedback** | Success/error status with Explorer hash link |
-| 🛸 **Freighter Guard** | Auto-detects missing extension, shows install guide |
-| 🌌 **3D Space UI** | Interstellar scene: stars, wormhole ring, planet, crystals |
+| 🔗 **Wallet Connect / Disconnect** | One-click Freighter integration with live status indicator |
+| 💰 **Live XLM Balance** | Fetched in real-time from the Stellar Horizon API |
+| ✈️ **Send XLM** | Enter a recipient address + amount and send on testnet |
+| 📡 **Transaction Feedback** | Success state with transaction hash, error state with message |
+| 🛸 **Freighter Guard** | Auto-detects if extension is missing and shows install guide |
+| 🌌 **3D Space UI** | Interstellar scene: 1,800-star field, wormhole ring, ringed planet |
 
 ---
 
-## System Design & Architecture
+## System Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                        USER BROWSER                          │
 │                                                              │
 │  ┌───────────────────────────────────────────────────────┐  │
-│  │                React Frontend  (Vite)                 │  │
+│  │               React Frontend (Vite)                   │  │
 │  │                                                       │  │
-│  │   Background3D.jsx        App.jsx (Root State)        │  │
-│  │   ─ Star field            ─ publicKey                 │  │
-│  │   ─ Wormhole ring         ─ balance                   │  │
-│  │   ─ Ringed planet         ─ txStatus / txHash         │  │
-│  │   ─ Nebula clouds                                     │  │
-│  │   ─ Data crystals         WalletConnect.jsx           │  │
-│  │                           BalanceCard.jsx             │  │
-│  │   FreighterNotice.jsx     SplitPaymentForm.jsx        │  │
-│  │   ─ Extension toast       TransactionStatus.jsx       │  │
+│  │  Background3D.jsx          App.jsx (Root State)       │  │
+│  │  ├─ Star field (1800pts)   ├─ publicKey               │  │
+│  │  ├─ Wormhole ring          ├─ balance                 │  │
+│  │  ├─ Ringed planet          ├─ txStatus / txHash       │  │
+│  │  └─ Data crystals          └─ txError                 │  │
+│  │                                                       │  │
+│  │  FreighterNotice.jsx       WalletConnect.jsx          │  │
+│  │  └─ Extension missing      BalanceCard.jsx            │  │
+│  │     toast popup            SplitPaymentForm.jsx       │  │
+│  │                            TransactionStatus.jsx      │  │
 │  └───────────────────────────────────────────────────────┘  │
 │                             │                                │
 └─────────────────────────────┼────────────────────────────────┘
@@ -60,68 +60,56 @@ By framing transactions around everyday bill-splitting, it bridges the gap betwe
  │ Freighter Extension│             │  Stellar Horizon API  │
  │  (Browser Wallet)  │             │  horizon-testnet      │
  │                    │             │  .stellar.org         │
- │  isConnected()     │             │                       │
- │  getAddress()      │             │  loadAccount()        │
- │  signTransaction() │             │  submitTransaction()  │
- └─────────┬──────────┘             └────────────┬──────────┘
-           │                                     │
+ │  isConnected()     │             │  loadAccount()        │
+ │  getAddress()      │             │  submitTransaction()  │
+ │  signTransaction() │             └────────────┬──────────┘
+ └─────────┬──────────┘                          │
            └──────────────────┬──────────────────┘
                               │
                    ┌──────────▼──────────┐
                    │   Stellar Testnet   │
-                   │   Blockchain        │
-                   │                    │
-                   │  Asset: XLM native │
-                   │  Network: TESTNET  │
-                   │  Passphrase signed │
+                   │  XLM · TESTNET      │
+                   │  Signed & submitted │
                    └────────────────────┘
 ```
 
-### Payment Transaction Flow
+### Transaction Flow
 
 ```
-User submits form
+User fills form
       │
       ▼
 SplitPaymentForm → onSend(recipient, amount)
       │
       ▼
 stellar.js → sendPayment()
-      │
-      ├── loadAccount(sender)      ← Horizon API: fetch sequence number
+      ├── Horizon: loadAccount(sender)     fetch sequence no.
       ├── TransactionBuilder
-      │     .addOperation(Payment) ← native XLM, recipient, amount
+      │     .addOperation(Payment)         native XLM
       │     .setTimeout(30)
-      │     .build()
-      │
-      ├── transaction.toXDR()
+      │     .build()  →  .toXDR()
       │
       ├── Freighter: signTransaction(xdr, 'TESTNET')
-      │         └── User approves popup
+      │         └── user approves popup
       │
-      ├── TransactionBuilder.fromXDR(signedXdr)
-      │
-      └── server.submitTransaction()
-                └── Stellar Ledger confirmed
+      └── server.submitTransaction(signedTx)
+                └── Stellar Testnet Ledger
                         │
-                        ▼
-              TransactionStatus.jsx
-              ✅  Hash + Explorer link
-              ❌  Error message
+              ┌─────────┴─────────┐
+              ✅ hash + link       ❌ error message
 ```
 
 ### Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Framework | React 18 + Vite |
+| Frontend | React 18 + Vite |
 | Styling | Tailwind CSS + CSS custom properties |
 | 3D Graphics | Three.js + `@react-three/fiber` |
 | Wallet | Freighter + `@stellar/freighter-api` |
-| Blockchain SDK | `@stellar/stellar-sdk` |
-| Network | Stellar Testnet — Horizon API |
+| Blockchain | `@stellar/stellar-sdk` · Stellar Testnet Horizon API |
 | Fonts | Inter + Space Grotesk (Google Fonts) |
-| Icons | Lucide React |
+| Deployment | Vercel |
 
 ---
 
@@ -130,9 +118,9 @@ stellar.js → sendPayment()
 ### Prerequisites
 
 - **Node.js** v18+
-- **[Freighter Wallet](https://www.freighter.app/)** extension (Chrome / Firefox)
-  - Set network to **Testnet** in Freighter settings
-  - Fund account at [Stellar Friendbot](https://laboratory.stellar.org/#account-creator?network=test)
+- **[Freighter Wallet](https://www.freighter.app/)** browser extension
+  - After installing: Settings → Network → **Testnet**
+  - Fund your account: [Stellar Friendbot](https://laboratory.stellar.org/#account-creator?network=test)
 
 ### Run Locally
 
@@ -143,25 +131,69 @@ npm install
 npm run dev
 ```
 
-Or visit the live deployment → **[smart-split-ebon.vercel.app](https://smart-split-ebon.vercel.app/)**
+Live deployment → **[smart-split-ebon.vercel.app](https://smart-split-ebon.vercel.app/)**
 
 ---
 
+## White Belt Requirements
 
+> This project fulfills all **Level 1 – White Belt** requirements of the Stellar developer program.
 
-### Stage 1 — Landing Page (Wallet Disconnected)
+### ✅ 1. Wallet Setup
+- Uses **Freighter** browser extension wallet
+- Configured for **Stellar Testnet** — `Networks.TESTNET` passphrase used in all transactions
 
-Smart Split & Pay is a premium dark-themed Stellar Testnet dApp with a cyan–violet gradient UI, glassmorphism wallet card, and live network badge. Built using React and Freighter, it enables secure wallet connection, XLM balance display, and seamless transactions with real-time feedback and hash tracking. The UI is enhanced with React Three Fiber, featuring floating wireframe geometries for a modern Web3 feel. Designed for scalability, it serves as a foundation for future features like bill splitting and smart contract integration.
-![Stage 1 – Wallet Disconnected](screenshots/03-interstellar-theme.png)
+### ✅ 2. Wallet Connection
+- **Connect**: `connectWallet()` in `stellar.js` calls `isConnected()`, `isAllowed()`, `setAllowed()`, `getAddress()` from `@stellar/freighter-api`
+- **Disconnect**: Clears `publicKey`, `balance`, and `txStatus` from React state
+- Connection status is displayed live in the UI with a pulsing indicator
+
+### ✅ 3. Balance Handling
+- `getAccountBalance(publicKey)` calls `server.loadAccount()` via Stellar Horizon API
+- Filters the `native` asset balance from the account's balance array
+- Displayed prominently in `BalanceCard.jsx` with "TOTAL BALANCE · XLM" label
+
+### ✅ 4. Transaction Flow
+- `sendPayment()` in `stellar.js` builds, signs via Freighter, and submits a native XLM payment
+- `TransactionStatus.jsx` shows:
+  - ✅ **Success** — green card with the transaction hash linked to [Stellar Expert Explorer](https://stellar.expert/explorer/testnet)
+  - ❌ **Error** — red card with the error message
+
+### ✅ 5. Development Standards
+- Modular component architecture (`WalletConnect`, `BalanceCard`, `SplitPaymentForm`, `TransactionStatus`)
+- Full error handling in `stellar.js` with `try/catch` blocks
+- Auto-detects missing Freighter extension and guides user to install it
+- Clean UI with loading states on the Connect button and Send button
 
 ---
 
+## Screenshots
 
-### Stage 2 — Wallet Connected + Live Balance
+### Landing Page — Wallet Disconnected
 
-Freighter connected — live testnet XLM balance (`10,000 XLM`) fetched from Stellar Horizon API. Split & Pay form revealed below with recipient address and amount fields.
+![Landing Page](screenshots/01-landing-disconnected.png)
 
-![Stage 2 – Wallet Connected & Balance](screenshots/04-wallet-connected-balance.png)
+---
+
+### Wallet Connecting State
+
+![Wallet Connecting](screenshots/02-wallet-connecting.png)
+
+---
+
+### Wallet Connected + Balance Displayed
+
+Wallet address shown with live XLM balance fetched from Stellar Horizon API. Split & Pay form is revealed below.
+
+![Wallet Connected & Balance](screenshots/04-wallet-connected-balance.png)
+
+---
+
+### Full UI — Interstellar Space Theme
+
+Complete view with 3D background (wormhole ring, ringed planet, star field) and all interface components.
+
+![Full App View](screenshots/03-interstellar-theme.png)
 
 ---
 
@@ -169,9 +201,9 @@ Freighter connected — live testnet XLM balance (`10,000 XLM`) fetched from Ste
 
 - **Group vaults** — Shared on-chain pools via Soroban smart contracts
 - **Bill splitting math** — Split a total equally across N friends
-- **Transaction history** — View past payments on-chain
+- **Transaction history** — View all past payments on-chain
 - **Mainnet mode** — Production deployment with real XLM
 
 ---
 
-> ⚠️ Testnet only. No real value is transferred. Ensure Freighter is set to **Testnet** before use.
+> ⚠️ **Testnet only.** No real value is transferred. Always verify Freighter is set to **Testnet** before use.
