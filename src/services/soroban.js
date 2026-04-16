@@ -84,17 +84,20 @@ export const classifyError = (error) => {
 
 // ─── CONTRACT CALL (simulate → sign → submit → poll) ─────────────────────────
 
-export const callContract = async (publicKey, fnName, args = []) => {
+export const callContractBatch = async (publicKey, operations) => {
   const account = await sorobanServer.getAccount(publicKey);
   const contract = new Contract(CONTRACT_ID);
 
-  const tx = new TransactionBuilder(account, {
-    fee: '1000000',
+  let txBuilder = new TransactionBuilder(account, {
+    fee: (1000000 * operations.length).toString(),
     networkPassphrase: Networks.TESTNET,
-  })
-    .addOperation(contract.call(fnName, ...args))
-    .setTimeout(30)
-    .build();
+  });
+
+  operations.forEach((op) => {
+    txBuilder = txBuilder.addOperation(contract.call(op.fnName, ...op.args));
+  });
+
+  const tx = txBuilder.setTimeout(30).build();
 
   // Simulate first
   const simResult = await sorobanServer.simulateTransaction(tx);
@@ -137,16 +140,19 @@ export const callContract = async (publicKey, fnName, args = []) => {
  * Transfer XLM via the Soroban Native Asset Contract (SAC).
  * This is the Yellow Belt "contract called from frontend" proof.
  */
-export const sacTransfer = async (senderPublicKey, recipientPublicKey, amountXlm) => {
-  const amountStroops = BigInt(Math.round(parseFloat(amountXlm) * 1e7));
+export const sacTransfer = async (senderPublicKey, recipientPublicKeys, amountXlmSplit) => {
+  const amountStroops = BigInt(Math.round(parseFloat(amountXlmSplit) * 1e7));
 
-  const args = [
-    nativeToScVal(Address.fromString(senderPublicKey), { type: 'address' }),
-    nativeToScVal(Address.fromString(recipientPublicKey), { type: 'address' }),
-    nativeToScVal(amountStroops, { type: 'i128' }),
-  ];
+  const operations = recipientPublicKeys.map(recipient => ({
+    fnName: 'transfer',
+    args: [
+      nativeToScVal(Address.fromString(senderPublicKey), { type: 'address' }),
+      nativeToScVal(Address.fromString(recipient), { type: 'address' }),
+      nativeToScVal(amountStroops, { type: 'i128' }),
+    ]
+  }));
 
-  return callContract(senderPublicKey, 'transfer', args);
+  return callContractBatch(senderPublicKey, operations);
 };
 
 // ─── EVENTS ──────────────────────────────────────────────────────────────────
