@@ -3,8 +3,6 @@ import { useState } from 'react';
 // ── White Belt components (unchanged) ────────────────────────────────────────
 import WalletConnect from './components/WalletConnect';
 import BalanceCard from './components/BalanceCard';
-import SplitPaymentForm from './components/SplitPaymentForm';
-import TransactionStatus from './components/TransactionStatus';
 import Background3D from './components/Background3D';
 import FreighterNotice from './components/FreighterNotice';
 
@@ -17,7 +15,6 @@ import ActivityFeed from './components/ActivityFeed';
 import {
   connectWallet,
   getAccountBalance,
-  sendPayment,
   openKitModal,
   disconnectKit,
   classifyError,
@@ -29,12 +26,6 @@ function App() {
   const [balance, setBalance] = useState('0.00');
   const [loading, setLoading] = useState(false);
 
-  // ── Transaction state (White Belt: idle/success/error + Yellow Belt: pending) ─
-  const [txStatus, setTxStatus] = useState('idle');
-  const [txHash, setTxHash] = useState('');
-  const [txError, setTxError] = useState('');
-  const [txErrorType, setTxErrorType] = useState('');
-
   // ── Yellow Belt: multi-wallet modal state ────────────────────────────────────
   const [showWalletModal, setShowWalletModal] = useState(false);
 
@@ -42,13 +33,6 @@ function App() {
   const [showFreighterNotice, setShowFreighterNotice] = useState(false);
 
   // ─────────────────────────────────────────────────────────────────────────────
-
-  const resetTx = () => {
-    setTxStatus('idle');
-    setTxHash('');
-    setTxError('');
-    setTxErrorType('');
-  };
 
   const updateBalance = async (pk) => {
     try {
@@ -71,9 +55,6 @@ function App() {
     if (err || !address) {
       const classified = classifyError(err || new Error('user_closed'));
       if (classified.type === 'wallet_not_found') setShowFreighterNotice(true);
-      setTxStatus('error');
-      setTxError(classified.message);
-      setTxErrorType(classified.type);
       return;
     }
     setPublicKey(address);
@@ -84,32 +65,7 @@ function App() {
     disconnectKit();
     setPublicKey(null);
     setBalance('0.00');
-    resetTx();
     setShowFreighterNotice(false);
-  };
-
-  // ── White Belt: Horizon XLM payment (pending state added) ────────────────────
-  const handleSendPayment = async (recipient, amount) => {
-    if (!publicKey) return;
-    setLoading(true);
-    setTxStatus('pending'); // Yellow Belt: pending state
-    setTxHash('');
-    setTxError('');
-    setTxErrorType('');
-
-    try {
-      const result = await sendPayment(publicKey, recipient, amount);
-      setTxStatus('success');
-      setTxHash(result.hash);
-      setTimeout(() => updateBalance(publicKey), 4000);
-    } catch (error) {
-      const classified = classifyError(error);
-      setTxStatus('error');
-      setTxError(classified.message);
-      setTxErrorType(classified.type);
-    } finally {
-      setLoading(false);
-    }
   };
 
   // ── Yellow Belt: Contract Panel result handler ────────────────────────────────
@@ -204,7 +160,7 @@ function App() {
           {publicKey ? (
             /* ── Connected: two-column layout ── */
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* Left column — White Belt features */}
+              {/* Left column */}
               <div className="space-y-4">
                 <WalletConnect
                   publicKey={publicKey}
@@ -213,23 +169,14 @@ function App() {
                   loading={loading && !publicKey}
                 />
                 <BalanceCard balance={balance} publicKey={publicKey} />
-                <SplitPaymentForm onSend={handleSendPayment} loading={loading} />
-                {txStatus !== 'idle' && (
-                  <TransactionStatus
-                    status={txStatus}
-                    error={txError}
-                    hash={txHash}
-                    onClear={resetTx}
-                  />
-                )}
-              </div>
-
-              {/* Right column — Yellow Belt features */}
-              <div className="space-y-4">
                 <ContractPanel
                   publicKey={publicKey}
                   onResult={handleContractResult}
                 />
+              </div>
+
+              {/* Right column */}
+              <div className="space-y-4">
                 <ActivityFeed />
               </div>
             </div>
@@ -242,14 +189,6 @@ function App() {
                 onDisconnect={handleDisconnect}
                 loading={loading && !publicKey}
               />
-              {txStatus !== 'idle' && (
-                <TransactionStatus
-                  status={txStatus}
-                  error={txError}
-                  hash={txHash}
-                  onClear={resetTx}
-                />
-              )}
             </div>
           )}
         </div>
