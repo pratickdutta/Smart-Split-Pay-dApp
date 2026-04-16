@@ -16,11 +16,19 @@ export default function ActivityFeed() {
   const [lastRefresh, setLastRefresh] = useState(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
+    // Only show loading indicator if we don't have events already, to stop layout flickering
+    if (events.length === 0) setLoading(true);
+    
     try {
       const evs = await fetchContractEvents();
-      setEvents(evs);
-      localStorage.setItem('smartsplit_events', JSON.stringify(evs));
+      
+      // Deduplicate to prevent re-renders on unchanged data
+      setEvents(prev => {
+        const isIdentical = prev.length === evs.length && prev.every((e, i) => e.id === evs[i].id);
+        if (isIdentical) return prev;
+        localStorage.setItem('smartsplit_events', JSON.stringify(evs));
+        return evs;
+      });
     } catch {
       // silent fail — feed shows empty or keeps cache
     } finally {
