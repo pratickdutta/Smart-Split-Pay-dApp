@@ -84,20 +84,17 @@ export const classifyError = (error) => {
 
 // ─── CONTRACT CALL (simulate → sign → submit → poll) ─────────────────────────
 
-export const callContractBatch = async (publicKey, operations) => {
+export const callContract = async (publicKey, fnName, args = []) => {
   const account = await sorobanServer.getAccount(publicKey);
   const contract = new Contract(CONTRACT_ID);
 
-  let txBuilder = new TransactionBuilder(account, {
-    fee: (1000000 * operations.length).toString(),
+  const tx = new TransactionBuilder(account, {
+    fee: '1000000',
     networkPassphrase: Networks.TESTNET,
-  });
-
-  operations.forEach((op) => {
-    txBuilder = txBuilder.addOperation(contract.call(op.fnName, ...op.args));
-  });
-
-  const tx = txBuilder.setTimeout(30).build();
+  })
+    .addOperation(contract.call(fnName, ...args))
+    .setTimeout(30)
+    .build();
 
   // Simulate first
   const simResult = await sorobanServer.simulateTransaction(tx);
@@ -143,16 +140,19 @@ export const callContractBatch = async (publicKey, operations) => {
 export const sacTransfer = async (senderPublicKey, recipientPublicKeys, amountXlmSplit) => {
   const amountStroops = BigInt(Math.round(parseFloat(amountXlmSplit) * 1e7));
 
-  const operations = recipientPublicKeys.map(recipient => ({
-    fnName: 'transfer',
-    args: [
+  let lastHash = null;
+
+  for (const recipient of recipientPublicKeys) {
+    const args = [
       nativeToScVal(Address.fromString(senderPublicKey), { type: 'address' }),
       nativeToScVal(Address.fromString(recipient), { type: 'address' }),
       nativeToScVal(amountStroops, { type: 'i128' }),
-    ]
-  }));
+    ];
+    const res = await callContract(senderPublicKey, 'transfer', args);
+    lastHash = res.hash;
+  }
 
-  return callContractBatch(senderPublicKey, operations);
+  return { hash: lastHash };
 };
 
 // ─── EVENTS ──────────────────────────────────────────────────────────────────
