@@ -476,6 +476,9 @@ The codebase has evolved to enterprise-grade production readiness, satisfying th
 
 - [x] **CI/CD running** — [![Continuous Integration](https://github.com/pratickdutta/Smart-Split-Pay-dApp/actions/workflows/ci.yml/badge.svg)](https://github.com/pratickdutta/Smart-Split-Pay-dApp/actions/workflows/ci.yml) `.github/workflows/ci.yml` fully setup on GitHub infrastructure.
 - [x] **Mobile responsive** — Completely refactored Tailwind classes mapped to `sm:` variants.
+      <br>*Screenshot of Mobile execution View:*<br>
+      ![Mobile Responsive](screenshots/08-mobile-responsive.png)
+- [x] **Live demo link** — Validated at the top of the repository (Vercel deployment).
 - [x] **Minimum 8+ meaningful commits** — Explicit histories spanning Event-streams, Mobile UI tweaks, CI setups.
 - [x] **README complete** — Everything fully documented.
 - [x] *(Skipped applicable logic for custom-tokens strictly inside React frontend due to SDK environments).*
