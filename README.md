@@ -477,7 +477,6 @@ The codebase has evolved to enterprise-grade production readiness, satisfying th
 - [x] **Live demo link** — Validated at the top of the repository (Vercel deployment).
 - [x] **Minimum 8+ meaningful commits** — Explicit histories spanning Event-streams, CI setups.
 - [x] **README complete** — Everything fully documented.
-- [x] *(Skipped applicable logic for custom-tokens strictly inside React frontend due to SDK environments).*
 
 ---
 
